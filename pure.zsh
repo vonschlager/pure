@@ -107,9 +107,6 @@ prompt_pure_preprompt_render() {
 	# Initialize the preprompt array.
 	local -a preprompt_parts
 
-	# Set the user at host.
-	preprompt_parts+=('%B%F{green}%n%f%F{blue}@%f%F{cyan}%m%f%b')
-
 	# Set the path.
 	preprompt_parts+=('%F{green}%~%f')
 
