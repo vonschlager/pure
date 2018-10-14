@@ -132,6 +132,9 @@ prompt_pure_preprompt_render() {
 	# Execution time.
 	[[ -n $prompt_pure_cmd_exec_time ]] && preprompt_parts+=('%F{yellow}${prompt_pure_cmd_exec_time}%f')
 
+	# nix-shell
+	[[ -n $prompt_pure_state[nix] ]] && preprompt_parts+=('${prompt_pure_state[nix]}')
+
 	local cleaned_ps1=$PROMPT
 	local -H MATCH MBEGIN MEND
 	if [[ $PROMPT = *$prompt_newline* ]]; then
@@ -535,10 +538,20 @@ prompt_pure_state_setup() {
 	# show username@host if root, with username in white
 	[[ $UID -eq 0 ]] && username='%F{white}%n%f%F{242}@%m%f'
 
+	local nix=
+    if [[ -n "$IN_NIX_SHELL" ]]; then
+        if [[ -n $name ]]; then
+            nix=${name#interactive-}
+            nix=${nix%-environment}
+            nix="%F{red}*${nix}*%f"
+        fi
+    fi
+
 	typeset -gA prompt_pure_state
 	prompt_pure_state=(
 		username "$username"
 		prompt	 "${PURE_PROMPT_SYMBOL:-❯}"
+        nix      "${nix}"
 	)
 }
 
@@ -580,6 +593,9 @@ prompt_pure_setup() {
 		add-zle-hook-widget zle-line-finish prompt_pure_reset_vim_prompt_widget
 		add-zle-hook-widget zle-keymap-select prompt_pure_update_vim_prompt_widget
 	fi
+
+    #clear right prompt
+    RPROMPT=""
 
 	# if a virtualenv is activated, display it in grey
 	PROMPT='%(12V.%F{242}%12v%f .)'
